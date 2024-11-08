@@ -4,7 +4,7 @@
 }
 
 .todo-app-container {
-       display: grid;
+    display: grid;
     grid-template-columns: 2fr 1fr;
     height: 100%;
     row-gap: 10px;
@@ -30,10 +30,17 @@
         li {
             cursor: pointer;
         }
+        li:hover{
+
+            display: flex;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #b4d1ff;
+            justify-content: space-between;
+        }
     }
-    li{
-        border-style: solid;
-    }
+
 }
 
 .todo-app-input{
@@ -43,38 +50,30 @@
     height: 100%;
     background-color: #b4d1ff;
     border-style: solid; 
-    text-align: center;
-
+    text-align: center; 
     
-    
-  
 }
+
 .button {   
   
     margin-right: 5px;
-    text-align: center;
-    color: white;
-    
-    
-  
+    text-align: center;   
 }
 
 .btnekle{
     background-color: blue;
     width: 33%;
     box-sizing: border-box;
-    color: white;
-
-    
+      
 }
 
 .btnguncelle{
     background-color: green;
     width: 33%;
     box-sizing: border-box;
-    color: white;
-
+    
 }
+
 .btnsil{
     background-color: red;
     margin-left: auto;
@@ -103,4 +102,9 @@
     background-color: lightblue;
   }
   
-
+.baslik{
+    
+    display: flex;
+    gap: 10px;
+    }
+    
