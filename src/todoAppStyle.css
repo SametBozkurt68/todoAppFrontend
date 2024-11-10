@@ -29,15 +29,14 @@
 
         li {
             cursor: pointer;
-        }
-        li:hover{
-
-            display: flex;
-            padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 8px;
-            background: #b4d1ff;
+            display: flex;
             justify-content: space-between;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        li:hover{              
+            background: #b4d1ff; 
         }
     }
 
@@ -75,10 +74,10 @@
 }
 
 .btnsil{
-    background-color: red;
+
     margin-left: auto;
     font-size: medium;
-    width: 25%;
+
     box-sizing: border-box;
     display: flex;
         
@@ -108,3 +107,11 @@
     gap: 10px;
     }
     
+.tarihbtn{
+    background-color: beige;
+    box-sizing: border-box;
+    border-radius: 10px;
+    height: 5vh;
+    width: 15%;
+
+}
