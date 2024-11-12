@@ -12,11 +12,14 @@ const TodoApp = () => {
     const [date, setDate] = useState('');
     const [error, setError] = useState('');
     const [durum,setDurum] = useState(0); 
-    
+    const[aciklama,setAciklma]=useState("");
+    const[filterData,setFilterData]=useState([])
+
     const getAll =()=>{
             axios.get("http://localhost:3100/todo-find-all")
         .then(response => {
           setTodoList(response.data)
+          setFilterData(response.data)
         })
         .catch(error => {
     
@@ -67,7 +70,7 @@ const TodoApp = () => {
     const handleUpdate = async () => {
         if (validateInput()) {
             try {
-                await axios.post("http://localhost:3100/todo-update", { todo_id: editTodo.todo_id,todo_adi: newTodo,date : date, durum:durum });
+                await axios.post("http://localhost:3100/todo-update", { todo_id: editTodo.todo_id,todo_adi: newTodo,date : date, durum:durum , aciklama:aciklama});
                 setEditTodo(null); 
                 setNewTodo('');
                 setDate('') ;
@@ -93,9 +96,13 @@ const TodoApp = () => {
         
     const sortTodos = () => {
         const sortedTodos = [...todoList].sort((a, b) => new Date(b.date) - new Date(a.date));
-        setTodoList(sortedTodos);
+        setFilterData(sortedTodos);
     };
-
+    const Arama=(query)=>{
+        
+       const bulunanveri = todoList.filter(item => item.todo_adi.toLowerCase().includes(query.toLowerCase()));
+       setFilterData(bulunanveri);
+    }
     
 
     const onClick = (selectedTodo) => {
@@ -105,6 +112,7 @@ const TodoApp = () => {
         setIsEditing(true);
         setDate(selectedTodo.date);
         setDurum(selectedTodo.durum)
+        setAciklma(selectedTodo.aciklama)
     };
 
     return (
@@ -112,33 +120,81 @@ const TodoApp = () => {
 
             <div className='todo-app-list'>
                 <h1>Liste</h1>
-                <ul>
+                    <div className='baslik'> 
+
+
+                    <input
+                     onChange={(e) =>Arama(e.target.value)}
+                      placeholder='Arama Yap'
+                      className='arama'
+                    >
+                    </input>
+   
                 
-                   <div className='baslik'> 
-                        <h5>|  Görev Adı  |</h5>
-                        <h5>|  Görev Tarihi  |</h5> 
-                        <h5>|  Durum  |</h5>
-                        <button className='tarihbtn' onClick={sortTodos}>Tarihe Göre Sırala</button>
+                    
+                      < button className='tarihbtn' onClick={sortTodos}>Tarihe Göre Sırala</button>
 
-                    </div>
-                     
-                    {
-                        todoList.map((item) => {
+                      </div>
+
+                        <table className='table'>
+                      <thead>
+                    <tr>
+                        <th>Durum İcon </th> 
+
+                        <th>Görev Adı </th>  
+                        <th>Görev Tarihi </th>
+                        <th>Durum </th>
+                        <th>Acıklama</th>
+                        <th>İşlem </th>
+                    </tr>
+
+                      </thead>
+                      <tbody>
+                
+                      {
+                        filterData.map((item) => {
+
                             return (
-
-                                <li 
-                                 key={item.todo_id} onClick={() => onClick(item)}>
-                                   {item.todo_adi} |   { new Date(item.date).toLocaleDateString()} | {item.durum === 1 ? "Yeni iş" : item.durum === 2 ? "Tamamlanmış iş" :  item.durum===3 ? "Tamamlanmamış iş": "" } |
-                                   <FaCheck color={item.durum ==1 ? "blue": item.durum ==2 ? "green":"red"}/>
+  <>
+                                                            
+                                      
+                                                
+                                    <tr  key={item.todo_id} onClick={() => onClick(item)} className={item.todo_id===editTodo?.todo_id ? "active" : ""}>
+                                        <td>        <FaCheck color={item.durum === 1 ? "blue" : item.durum === 2 ? "green" : "red"} /> </td>
+                                        <td>{item.todo_adi}</td>
+                                        <td>{new Date(item.date).toLocaleDateString()}</td>
+                                        <td style={{color:item.durum ===2?"green":item.durum===1?"blue": "red"}}>
+                                        {item.durum === 1 ? "Yeni iş" : item.durum === 2 ? "Tamamlanmış iş" : item.durum === 3 ? "Tamamlanmamış iş" : ""}
+                                        </td>
+                                        <td>{item.aciklama}</td>
+                                        <td>
+                                        <button onClick={() => handleDelete(item.todo_id)} className=' btnsil'><FaTrash color={"red"} /></button> 
+                                        </td>
+                                                            
+                                    </tr> 
+                                                   
+                                        
+                                           
                                   
-                                <button onClick={() => handleDelete(item.todo_id)} className=' btnsil'><FaTrash color={"red"} /></button>
-                                </li>
-                            )
+                                  
+           
+                                </>
+                               
+                            ) 
+
                         })
                         
-                    }
+                    }     
+                      </tbody>
+
+                 
+              
+                     
+                 
                     
-                </ul>
+                      </table>
+                    
+            
 
             </div>
 
@@ -148,10 +204,10 @@ const TodoApp = () => {
                     value={durum}
                     onChange={(e) =>setDurum(e.target.value)}
                     className='input'
-                >     <option value="0" ></option>
+                >     
                       <option value="1">Yeni iş</option>
                       <option value="2">Tamamlanan iş</option>
-                      <option value="3">Tamamlanamayan iş</option>
+                      <option value="3">Tamamlanmamış iş</option>
            
                 </select>
 
@@ -162,18 +218,26 @@ const TodoApp = () => {
                         className={`input ${isEditing ? 'active' : ''}`}
                         maxLength={255}
                      /> 
+                    
                     <input
                         type='date' 
                         value={date}  
                         onChange={(e)=>setDate(e.target.value)}
                         className='input'
-                    />
+                    />  
+                     {parseInt(durum)===3? (   <input
+                        value={aciklama}
+                        onChange={(e) => setAciklma(e.target.value)}
+                        placeholder='Acıklama giriniz'
+                        className={`input`}
+                 
+                     /> ) : ""}
                        
-                         {error && <p className="error">{error}</p>}
+                       
             
                     <div className="button">
                             
-                        <button onClick={handleCreate} className="btnekle" >Ekle</button>
+                        <button onClick={handleCreate} className="btnekle" disabled ={isEditing } >Ekle</button>
                         <button onClick={handleUpdate} className="btnguncelle" >Güncelle</button>
                         <button onClick={() => handleDelete(editTodo?.todo_id)} className="  btnsil2">Sil</button>
 
